@@ -1,0 +1,448 @@
+#include <string>
+#include <iostream>
+#include <fstream>
+#include <list>
+#define N 50
+#define NP 50
+
+using namespace std;
+
+
+class Musica {
+public:
+    string nome;
+    string autor;
+    string duracao;
+    string genero;
+
+    void setMusica(string a, string n, string g, string d){
+        autor = a;
+        nome = n;
+        genero = g;
+        duracao = d;
+    }
+    // ~Musica(void);
+};
+
+class Playlist{
+public:
+    string nomePls;
+    Musica musicas[100];
+    int numMusicas;
+
+
+
+    void addMusic(Musica musica);
+    bool removeMusic(Musica musica);
+    bool removeMusic(int);
+    bool addPlaylist(string);
+    void mostraPlaylist(void);
+    void mostraPlaylist(string);
+    void sortArtist(void);
+    void sortMusic(void);
+    bool savePlaylist(string);
+    void setPls(string nome){
+        nomePls = nome;
+    }
+
+};
+
+
+void Playlist::addMusic(Musica musica){
+    numMusicas ++;
+    for(int i = 0; i < numMusicas; i++){
+        if(musicas[i].nome.empty()){
+            musicas[i] = musica;
+        }
+    }
+}
+
+bool Playlist::removeMusic(Musica musica){
+    for(int i = 0; i < numMusicas; i++){
+        if(musica.nome == musicas[i].nome){
+            musicas[i].nome.clear();
+            musicas[i].autor.clear();
+            musicas[i].duracao.clear();
+            musicas[i].genero.clear();
+            sortMusic();
+            numMusicas--;
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+}
+
+bool Playlist::removeMusic(int i){
+    if(!musicas[i].nome.empty()){
+        musicas[i].nome.clear();
+        musicas[i].autor.clear();
+        musicas[i].duracao.clear();
+        musicas[i].genero.clear();
+        sortMusic();
+        numMusicas--;
+        return true;
+    }
+    else{
+        return false;
+    }
+}
+
+
+bool Playlist::addPlaylist(string arq){
+    string aux;
+    string aux2;
+    string aux3;
+    string aux4;
+    string aux5;
+    string aux6;
+    string aux7;
+    string aux8;
+    string aux9;
+    string nomeAux;
+    string autorAux;
+    string duracaoAux;
+    string generoAux;
+
+
+    ifstream in01(arq + ".ply", ios::in);
+    if(in01.is_open()){
+        cout << "O arquivo01 foi aberto...\n";
+        while(!in01.eof()){
+            getline(in01,aux);
+
+            int x = aux.find("-");
+            aux2 = aux.substr(0, x);
+            x ++;
+
+            aux3 = aux.substr(x);
+            int x2 = aux3.find("-");
+            aux4 = aux3.substr(0, x2);
+            x2 ++;
+
+            aux5 = aux.substr((x + x2));
+            int x3 = aux5.find("-");
+            aux6 = aux5.substr(0, x3);
+            x3 ++;
+
+            aux7 = aux.substr((x + x2 + x3));
+            int x4 = aux7.find("-");
+            aux8 = aux7.substr(0, x4);
+            x4 ++;
+
+            aux9 = aux.substr((x+x2+x3+x4));
+
+            autorAux = aux4;
+            nomeAux = aux6;
+            generoAux = aux8;
+            duracaoAux = aux9;
+
+
+            musicas[numMusicas].nome = nomeAux;
+            musicas[numMusicas].autor = autorAux;
+            musicas[numMusicas].genero = generoAux;
+            musicas[numMusicas].duracao = duracaoAux;
+            numMusicas ++;
+        }
+    }
+
+
+    in01.close();
+    return true;
+}
+
+void Playlist::mostraPlaylist(void){
+    cout << "Playlist " << nomePls << endl << endl;
+    if(numMusicas == 1){
+        cout << "0 - " << musicas[0].autor << " - " <<  musicas[0].nome  << " - " << musicas[0].genero << " - " << musicas[0].duracao << endl;
+    }
+    else{
+        for(int cont = 0; cont < numMusicas; cont ++){  
+            cout << cont << " - " << musicas[cont].autor << " - " <<  musicas[cont].nome  << " - " << musicas[cont].genero << " - " << musicas[cont].duracao << endl;
+        }
+    }
+}
+
+void Playlist::mostraPlaylist(string gen){
+    cout << "Playlist " << nomePls << "-- Filtro pelo genero " << gen << endl << endl;
+    for(int cont = 0; cont < numMusicas; cont ++){  
+        if(musicas[cont].genero == gen){
+            cout << cont << " - " << musicas[cont].autor << " - " <<  musicas[cont].nome  << " - " << musicas[cont].genero << " - " << musicas[cont].duracao << endl;
+        }
+    }
+}
+
+void Playlist::sortArtist(void){
+    bool swapped;
+    for(int i = 0; i < (numMusicas - 1); i++){
+        swapped = false;
+        for(int j = 0; j < (numMusicas - i - 2); j++){
+            if(musicas[j].autor > musicas[j + 1].autor){
+                swap(musicas[j].autor, musicas[j + 1].autor);
+                swap(musicas[j].nome, musicas[j + 1].nome);
+                swap(musicas[j].duracao, musicas[j + 1].duracao);
+                swap(musicas[j].genero, musicas[j + 1].genero);
+                swapped = true;
+            }
+        }
+        if (swapped == false){
+            break;
+        }
+    }
+}
+
+void Playlist::sortMusic(void){
+    bool swapped;
+    for(int i = 0; i < (numMusicas - 1); i++){
+        swapped = false;
+        for(int j = 0; j < (numMusicas - i - 2); j++){
+            if(musicas[j].nome > musicas[j + 1].nome){
+                swap(musicas[j].nome, musicas[j + 1].nome);
+                swap(musicas[j].autor, musicas[j + 1].autor);
+                swap(musicas[j].duracao, musicas[j + 1].duracao);
+                swap(musicas[j].genero, musicas[j + 1].genero);
+                swapped = true;
+            }
+        }
+        if (swapped == false){
+            break;
+        }
+    }
+}
+
+bool Playlist::savePlaylist(string arq){
+    ofstream out01 (arq + ".ply", ios::out);
+    if(out01.is_open()){
+        for(int cont = 0; cont < numMusicas-1; cont++){    
+
+            out01.unsetf(ios::adjustfield);
+            out01.setf(ios::left);
+            out01 << cont;
+            out01 << " - ";
+
+
+            out01.unsetf(ios::adjustfield);
+            out01.setf(ios::left);
+            out01 << musicas[cont].autor;
+            out01 << " - ";
+
+ 
+            out01.unsetf(ios::adjustfield);
+            out01.setf(ios::left);
+            out01 <<  musicas[cont].nome;
+            out01 << " - ";
+
+
+            out01.unsetf(ios::adjustfield);
+            out01.setf(ios::left);
+            out01 << musicas[cont].genero;
+            out01 << " - ";
+
+
+            out01.unsetf(ios::adjustfield);
+            out01.setf(ios::left);
+            out01 << musicas[cont].duracao;
+            out01 << endl;
+        }
+        out01.close();
+        return true;
+    }
+}
+
+
+int main() {
+    int escolha1;
+    int escolhaPls;
+    int escolha2;
+    int escolha3;
+    string nomeAux;
+    string nomeAux2;
+    string nomeAux3;
+    string autorAux;
+    string duracaoAux;
+    string generoAux;
+    string plsAux;
+    string arqAux;
+    int numeroAux;
+    Playlist pls[10];
+    Musica mus[100];
+    int numPls = 0;
+    int numMusicas = 0;
+    int espera = 1;
+    int espera2 = 1;
+
+    while (espera == 1){
+        cout << "--------------------------------------------------------------" << endl;
+        cout << "                            MENU                              " << endl;
+        cout << "--------------------------------------------------------------" << endl;
+        cout << "  Escolha a opcao desejada                                    " << endl;
+        cout << "1 - Criar PlayList" << endl;
+        cout << "2 - Escolher Playlist" << endl;
+        cin >> escolha1;
+        system("cls");
+
+
+        switch(escolha1){
+        case 1:
+            cout << "Digite um nome para a Playlist: ";
+            cin >> nomeAux;
+            pls[numPls].setPls(nomeAux);
+            numPls++;
+            escolha1 = 0;
+            system("cls");
+            break;
+
+        case 2:
+
+            cout << "--------------------------------------------------------------" << endl;
+            cout << "                 Escolha a Playlists                          " << endl;
+            cout << "--------------------------------------------------------------" << endl;
+            for(int i = 0; i < numPls; i++){
+                cout << i << " - " << pls[i].nomePls << endl;
+
+            }
+            cout << "Digite a Playlist desejada" << endl;
+            cin >> escolhaPls;
+            system("cls");
+            espera2 = 1;
+            while(espera2 == 1){
+                cout << "--------------------------------------------------------------" << endl;
+                cout << "             Playlists " << pls[escolhaPls].nomePls        << endl;
+                cout << "--------------------------------------------------------------" << endl;
+                cout << "  Escolha a opcao desejada                                    " << endl;
+                cout << "1 - Adcionar musica" << endl;
+                cout << "2 - Remover musica" << endl;
+                cout << "3 - Adcionar Playlist" << endl;
+                cout << "4 - Mostrar Playlist" << endl;
+                cout << "5 - Ordenar por musica" << endl;
+                cout << "6 - Ordenar por artista" << endl;
+                cout << "7 - Salvar em ply" << endl;
+                cout << "8 - Voltar ao menu anterior" << endl;
+
+                cout << "Escolha a opcao desejada" << endl;
+                cin >> escolha2;
+                system("cls");
+
+                switch(escolha2){
+                case 1:
+                    cout << "Digite o nome da musica" << endl;
+                    cin >> nomeAux2;
+                    system("cls");
+                    cout << "Digite o nome do artista" << endl;
+                    cin >> autorAux;
+                    system("cls");
+                    cout << "Digite a duracao da musica em segundos" << endl;
+                    cin >> duracaoAux;
+                    system("cls");
+                    cout << "Digite o genero da musica" << endl;
+                    cin >> generoAux;
+                    system("cls");
+                    mus[numMusicas].setMusica(autorAux, nomeAux2, generoAux, duracaoAux);
+                    nomeAux2 = "";
+                    autorAux = "";
+                    duracaoAux = "";
+                    generoAux = "";
+                    pls[escolhaPls].addMusic(mus[numMusicas]);
+                    numMusicas++;
+                    break;
+
+                case 2:
+                    cout << "Escolha como deseja remover a musica " << endl;
+                    cout << "1 - Por posicao da playlist" << endl;
+                    cout << "2 - Por nome da musica" << endl;
+                    cin >> escolha3;
+                    system("cls");
+                    switch(escolha3){
+                    case 1:
+                        cout << "Digite o numero da musica" << endl;
+                        cin >> numeroAux;
+                        system("cls");
+                        if(pls[escolhaPls].removeMusic(numeroAux) == true){
+                            cout << "Musica removida com sucesso" << endl;
+                            system("pause");
+                            system("cls");
+                        }else{
+                            cout << "Musica nao encontrada" << endl;
+                            system("pause");
+                            system("cls");
+                        }
+                        escolha3 = 0;
+                        break;
+
+                    case 2:
+                        cout << "Digite o nome da musica" << endl;
+                        cin >> nomeAux2;
+                        for(int cont = 0; cont <= numMusicas; cont++){
+                            if(mus[cont].nome == nomeAux2){
+                                if(pls[escolhaPls].removeMusic(mus[cont])==true){
+                                    cout << "Musica removida com sucesso" << endl;
+                                    system("pause");
+                                    system("cls");
+                                }else{
+                                    cout << "Musica nao encontrada" << endl;
+                                    system("pause");
+                                    system("cls");
+                                }
+                            }
+                        }
+                    }
+                    escolha3 = 0;
+                    break;
+                case 3:
+                    cout << "Digite o nome da Playlist que deseja adicionar a " << pls[escolhaPls].nomePls << endl;
+                    cin >> plsAux;
+
+                    system("cls");
+                    plsAux = plsAux;
+                    if(pls[escolhaPls].addPlaylist(plsAux)==true){
+                        cout << "Playlist adcionada com sucesso" << endl;
+                        system("pause");
+                        system("cls");
+                    }else{
+                        cout << "Nao foi possivel a adcionar a Playlist" << endl;
+                        system("pause");
+                        system("cls");
+                    }
+                    escolha3 = 0;
+                    break;
+                case 4:
+                    pls[escolhaPls].mostraPlaylist();
+                    system("pause");
+                    system("cls");
+                    escolha3 = 0;
+                    break;
+                case 5:
+                    pls[escolhaPls].sortMusic();
+                    escolha3 = 0;
+                    break;
+                case 6:
+                    pls[escolhaPls].sortArtist();
+                    escolha3 = 0;
+                    break;
+                case 7:
+                    cout << "Digite o nome que voce deseja que o arquivo tenha" << endl;
+                    cin >> arqAux;
+
+                    system("cls");
+                    if(pls[escolhaPls].savePlaylist(arqAux)==true){
+                        cout << "Arquivo salvo com sucesso" << endl;
+                        system("pause");
+                        system("cls");
+                    }else{
+                        cout << "Nao foi possivel salvar o arquivo" << endl;
+                        system("pause");
+                        system("cls");
+
+                    }
+                    escolha3 = 0;
+                    break;
+                case 8:
+                    espera2 = 0;
+                    break;
+                }
+            }
+        }
+    }
+    return 0;
+}
